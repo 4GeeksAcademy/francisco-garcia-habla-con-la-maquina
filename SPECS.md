@@ -229,18 +229,18 @@ The route accepts `messages: Message[]`, sends the complete history upstream, an
 
 ## 20. Acceptance Criteria
 
-- **REQ-036:** A user can enter a message and send it through the UI.
-- **REQ-037:** User and assistant messages are visibly distinct and ordered correctly.
-- **REQ-038:** Each Groq request contains the complete conversation history.
-- **REQ-039:** The browser-to-server-to-Groq architecture is enforced, with no client-side secret.
-- **REQ-040:** A thinking indicator appears during requests and duplicate sends are prevented.
-- **REQ-041:** Non-2xx and network failures produce clear, recoverable user-facing feedback.
-- **REQ-042:** Prompt, completion, and total usage values are read, accumulated, persisted, restored after reload, and displayed consistently.
-- **REQ-043:** At least one real Groq metric beyond combined tokens is displayed.
-- **REQ-044:** The logical chat session, including messages and accumulated metrics, is restored after reload and can be cleared from both UI and localStorage.
-- **REQ-045:** The implementation uses one configurable `MODEL_ID`, with the concrete model selected during implementation to resolve the documented assignment conflict.
-- **REQ-046:** The interface is readable, keyboard-usable, and responsive on mobile and desktop.
-- **REQ-047:** No unnecessary assignment-external feature or prohibited SDK/wrapper is present.
+- **AC-001:** A user can enter a message and send it through the UI.
+- **AC-002:** User and assistant messages are visibly distinct and ordered correctly.
+- **AC-003:** Each Groq request contains the complete conversation history.
+- **AC-004:** The browser-to-server-to-Groq architecture is enforced, with no client-side secret.
+- **AC-005:** A thinking indicator appears during requests and duplicate sends are prevented.
+- **AC-006:** Non-2xx and network failures produce clear, recoverable user-facing feedback.
+- **AC-007:** Prompt, completion, and total usage values are read, accumulated, persisted, restored after reload, and displayed consistently.
+- **AC-008:** At least one real Groq metric beyond combined tokens is displayed.
+- **AC-009:** The logical chat session, including messages and accumulated metrics, is restored after reload and can be cleared from both UI and localStorage.
+- **AC-010:** The implementation uses one configurable `MODEL_ID`, with the concrete model selected during implementation to resolve the documented assignment conflict.
+- **AC-011:** The interface is readable, keyboard-usable, and responsive on mobile and desktop.
+- **AC-012:** No unnecessary assignment-external feature or prohibited SDK/wrapper is present.
 
 ## 21. Out of Scope
 
