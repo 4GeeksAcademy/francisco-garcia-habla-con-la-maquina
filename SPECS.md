@@ -135,7 +135,7 @@ The client owns UI and session state. The server route validates the incoming me
 
 ### Assignment compatibility note: model name conflict
 
-The source assignment contains conflicting model instructions: one section specifies `qwen/qwen3.6-27b`, while another refers to Llama 3. This conflict is intentionally preserved rather than silently resolved here. The application must use one configurable `MODEL_ID` as its source of truth. The concrete runtime model will be selected during implementation based on the course requirement and current Groq availability. Model identifiers must never be scattered throughout the codebase, and the application must not add multiple model-selection UI features.
+The source assignment contains conflicting model instructions: one section specifies `qwen/qwen3.6-27b`, while another refers to Llama 3. This conflict is intentionally preserved rather than silently resolved here. The implementation decision has now been resolved during Phase B after verifying current Groq availability: `qwen/qwen3.8-27b` is the selected runtime `MODEL_ID`. The value remains configurable through `MODEL_ID` as the application's source of truth. Model identifiers must never be scattered throughout the codebase, and the application must not add multiple model-selection UI features.
 
 ## 11. Error States
 
