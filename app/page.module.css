@@ -53,7 +53,10 @@
 .textarea::placeholder { color: var(--muted-foreground); }
 .send { display: flex; width: 44px; height: 44px; align-items: center; justify-content: center; flex-shrink: 0; border: 0; border-radius: 12px; background: var(--primary); color: var(--primary-foreground); cursor: pointer; }
 .send:hover { transform: translateY(-2px); background: color-mix(in srgb, var(--primary) 90%, black); }
+.send:disabled, .clear:disabled, .textarea:disabled { cursor: not-allowed; opacity: .55; }
+.send:disabled:hover { transform: none; background: var(--primary); }
 .hint { margin: 8px 0 0; text-align: center; color: var(--muted-foreground); font-size: 11px; }
+.loading { margin: 0; color: var(--muted-foreground); font-size: 14px; }
 .sidebar { width: 100%; flex-shrink: 0; border-top: 1px solid var(--border); background: color-mix(in srgb, var(--muted) 45%, transparent); }
 .sidebarInner { display: flex; height: 100%; flex-direction: column; padding: 20px; }
 .sidebarHeading { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 28px; }
