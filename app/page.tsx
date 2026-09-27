@@ -41,6 +41,7 @@ export default function Page() {
     setInput('')
     setError(null)
     setLoading(true)
+    const startedAt = performance.now()
 
     try {
       const response = await fetch('/api/chat', {
@@ -57,6 +58,15 @@ export default function Page() {
       }
       const chatResponse = data as ChatApiResponse
       setMessages((current) => [...current, chatResponse.message])
+      const responseTime = Math.round(performance.now() - startedAt)
+      setMetrics((current) => ({
+        ...current,
+        promptTokens: current.promptTokens + chatResponse.usage.promptTokens,
+        completionTokens: current.completionTokens + chatResponse.usage.completionTokens,
+        totalTokens: current.totalTokens + chatResponse.usage.totalTokens,
+        model: chatResponse.model,
+        responseTime,
+      }))
     } catch (requestError) {
       setError(requestError instanceof Error ? requestError.message : 'No se pudo obtener una respuesta del asistente.')
     } finally {
