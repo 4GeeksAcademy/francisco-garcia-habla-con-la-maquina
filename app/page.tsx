@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import styles from './page.module.css'
 import type { ChatApiResponse, Message, Metrics } from '../types/chat'
 import { ChatMessage } from '../components/chat/ChatMessage'
@@ -24,6 +24,32 @@ function Icon({ name, size = 18 }: { name: IconName; size?: number }) {
 }
 
 const initialMetrics: Metrics = { promptTokens: 0, completionTokens: 0, totalTokens: 0, model: null, responseTime: null }
+const STORAGE_KEY = 'habla-con-la-maquina:session:v1'
+
+type PersistedSession = {
+  version: 1;
+  messages: Message[];
+  metrics: Metrics;
+}
+
+function isPersistedSession(value: unknown): value is PersistedSession {
+  if (typeof value !== 'object' || value === null) return false
+  const session = value as Record<string, unknown>
+  if (session.version !== 1 || !Array.isArray(session.messages) || typeof session.metrics !== 'object' || session.metrics === null) return false
+
+  const messagesValid = session.messages.every((message) => {
+    if (typeof message !== 'object' || message === null) return false
+    const candidate = message as Record<string, unknown>
+    return (candidate.role === 'user' || candidate.role === 'assistant') && typeof candidate.content === 'string' && candidate.content.trim().length > 0
+  })
+  if (!messagesValid) return false
+
+  const metrics = session.metrics as Record<string, unknown>
+  const isNonNegativeNumber = (value: unknown): value is number => typeof value === 'number' && Number.isFinite(value) && value >= 0
+  return isNonNegativeNumber(metrics.promptTokens) && isNonNegativeNumber(metrics.completionTokens) && isNonNegativeNumber(metrics.totalTokens)
+    && (typeof metrics.model === 'string' || metrics.model === null)
+    && (metrics.responseTime === null || isNonNegativeNumber(metrics.responseTime))
+}
 
 export default function Page() {
   const [messages, setMessages] = useState<Message[]>([])
@@ -31,6 +57,47 @@ export default function Page() {
   const [loading, setLoading] = useState(false)
   const [metrics, setMetrics] = useState<Metrics>(initialMetrics)
   const [error, setError] = useState<string | null>(null)
+  const [hydrated, setHydrated] = useState(false)
+
+  useEffect(() => {
+    queueMicrotask(() => {
+      try {
+        const stored = window.localStorage.getItem(STORAGE_KEY)
+        if (stored !== null) {
+          const parsed: unknown = JSON.parse(stored)
+          if (isPersistedSession(parsed)) {
+            setMessages(parsed.messages)
+            setMetrics(parsed.metrics)
+          } else {
+            window.localStorage.removeItem(STORAGE_KEY)
+          }
+        }
+      } catch {
+        window.localStorage.removeItem(STORAGE_KEY)
+      } finally {
+        setHydrated(true)
+      }
+    })
+  }, [])
+
+  useEffect(() => {
+    if (!hydrated) return
+
+    const isEmptySession = messages.length === 0
+      && metrics.promptTokens === 0
+      && metrics.completionTokens === 0
+      && metrics.totalTokens === 0
+      && metrics.model === null
+      && metrics.responseTime === null
+
+    if (isEmptySession) {
+      window.localStorage.removeItem(STORAGE_KEY)
+      return
+    }
+
+    const session: PersistedSession = { version: 1, messages, metrics }
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(session))
+  }, [hydrated, messages, metrics])
 
   async function submitMessage() {
     if (loading) return
@@ -76,6 +143,7 @@ export default function Page() {
 
   function clearConversation() {
     setMessages([]); setInput(''); setLoading(false); setError(null); setMetrics(initialMetrics)
+    window.localStorage.removeItem(STORAGE_KEY)
   }
 
   return <main className={styles.page}><div className={styles.shell}>
