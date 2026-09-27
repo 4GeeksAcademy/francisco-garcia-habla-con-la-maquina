@@ -2,7 +2,7 @@
 
 import { useState, type ReactNode } from 'react'
 import styles from './page.module.css'
-import type { Message, Metrics } from '../types/chat'
+import type { ChatApiResponse, Message, Metrics } from '../types/chat'
 import { ChatMessage } from '../components/chat/ChatMessage'
 import { ChatComposer } from '../components/chat/ChatComposer'
 import { MetricsPanel } from '../components/chat/MetricsPanel'
@@ -32,13 +32,36 @@ export default function Page() {
   const [metrics, setMetrics] = useState<Metrics>(initialMetrics)
   const [error, setError] = useState<string | null>(null)
 
-  function submitMessage() {
+  async function submitMessage() {
     if (loading) return
     const content = input.trim()
     if (!content) { setError('Escribe un mensaje antes de enviar.'); return }
-    setMessages((current) => [...current, { role: 'user', content }])
+    const nextMessages = [...messages, { role: 'user' as const, content }]
+    setMessages(nextMessages)
     setInput('')
     setError(null)
+    setLoading(true)
+
+    try {
+      const response = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: nextMessages }),
+      })
+      const data: unknown = await response.json()
+      if (!response.ok) {
+        const message = typeof data === 'object' && data !== null && typeof (data as { error?: unknown }).error === 'string'
+          ? (data as { error: string }).error
+          : 'No se pudo obtener una respuesta del asistente.'
+        throw new Error(message)
+      }
+      const chatResponse = data as ChatApiResponse
+      setMessages((current) => [...current, chatResponse.message])
+    } catch (requestError) {
+      setError(requestError instanceof Error ? requestError.message : 'No se pudo obtener una respuesta del asistente.')
+    } finally {
+      setLoading(false)
+    }
   }
 
   function clearConversation() {
