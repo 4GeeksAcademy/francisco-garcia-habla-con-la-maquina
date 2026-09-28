@@ -1,41 +1,91 @@
-# HTML Hello
+# Habla con la Máquina
 
-The most basic boilerplate for any 4Geeks Academy student, start your very first website from scratch.
+A responsive Next.js chat interface connected to a real Groq AI API through a secure server route.
 
-> There is a video tutorial on [how to use this template to create your very first website here](https://youtu.be/dfbDCMu_p-0).
+## Features
 
-## What to do next?
+- Real Groq API communication
+- Next.js `/api/chat` server route
+- Complete multi-turn conversation history
+- Loading and recoverable error states
+- Prompt, completion, and total token accounting
+- Accumulated session metrics
+- Returned model display
+- Real response-time measurement
+- `localStorage` conversation persistence
+- Reload recovery
+- Clear-conversation behavior
+- Responsive UI
+- Keyboard controls, including Enter to send and Shift + Enter for a new line
 
-Create an `index.html` file with the [basic HTML structure](http://4geeks.com/lesson/what-is-html-learn-html#page-structure) and see it live by running a web-server using the following command:
+## Architecture
+
+```text
+Browser / React
+        ↓
+Next.js /api/chat
+        ↓
+Groq API
+```
+
+The browser sends the conversation to the Next.js `/api/chat` route. The server route validates the request and communicates with Groq using the server-side `GROQ_API_KEY`. The API key never reaches the browser or localStorage.
+
+## Tech Stack
+
+- Next.js 16
+- React 19
+- TypeScript
+- CSS Modules
+- Native `fetch`
+- Groq Chat Completions API
+- Browser `localStorage`
+
+## Environment
+
+Create a local environment file from the example:
 
 ```bash
-$ pip3 install flask && python3 server.py
+cp .env.example .env.local
 ```
 
-- You can create as many HTML files as you want.
-- You can also create CSS files and import them into your website using a `<link>` tag placed between the `<head></head>` tags, like this:
+Set the server-side configuration in `.env.local`:
 
-```html
-<head>
-  ...
-  <link rel="stylesheet" type="text/css" href="styles.css">
-  ...
-</head>
+```text
+GROQ_API_KEY=
+MODEL_ID=qwen/qwen3.8-27b
 ```
 
-- If you want to use Tailwind CSS, add it optionally via the official Tailwind CSS v4 CDN inside the same `<head>`:
+Keep `.env.local` private. It is ignored by Git and must never be committed.
 
-```html
-<head>
-  ...
-  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-  <link rel="stylesheet" type="text/css" href="styles.css">
-  ...
-</head>
+## Development
+
+Install dependencies and start the development server:
+
+```bash
+npm install
+npm run dev
 ```
 
-### Contributors
+Open the local URL shown by Next.js in your browser.
 
-This template was built as part of the [Full Stack Developer course](https://4geeksacademy.com/us/coding-bootcamps/part-time-full-stack-developer) at [4Geeks Academy Coding Bootcamp](https://4geeksacademy.com/us/coding-bootcamp) by [Alejandro Sanchez](https://twitter.com/alesanchezr) and [many other contributors](https://github.com/4GeeksAcademy/html-hello/graphs/contributors).
+## Validation
 
-You can find other templates and resources like this at the [school's GitHub page](https://github.com/4geeksacademy/).
+Run the project checks with:
+
+```bash
+npm run lint
+npm run build
+npx tsc --noEmit
+```
+
+## Project Requirements / Important Behavior
+
+- Every model request includes the complete conversation history, including the newly submitted user message.
+- Prompt, completion, and total token usage accumulates after each successful API call.
+- Persisted messages and metrics survive a page reload through a versioned localStorage session.
+- Clear conversation resets the visible chat and removes the persisted session.
+- Input, loading state, errors, API keys, authorization headers, and environment values are not persisted.
+
+## Repository
+
+[4GeeksAcademy/francisco-garcia-habla-con-la-maquina](https://github.com/4GeeksAcademy/francisco-garcia-habla-con-la-maquina)
